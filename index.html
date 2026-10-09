@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#16213e" />
+  <meta name="description" content="osm2mbt – Convertisseur OSM → MBTiles (sélection rectangulaire, GPX/KML)" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>osm2mbt</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <div class="warning">
+      ⚠ Génération MBTiles = téléchargement massif de tuiles. Respectez la
+      <a href="https://operations.osmfoundation.org/policies/tiles/" target="_blank" rel="noopener" style="color:#ffb0b0">politique OSM</a>
+      – zones très limitées uniquement. Utilisez de préférence votre propre serveur de tuiles.
+    </div>
+
+    <header>
+      <h1>osm<span>2</span>mbt</h1>
+      <div class="controls">
+        <label>
+          Fond
+          <select id="basemap">
+            <option value="osm">OSM (standard)</option>
+            <option value="osmfr">OSM France (toponymie FR)</option>
+            <option value="hot">Humanitarian</option>
+          </select>
+        </label>
+
+        <label>
+          Z min
+          <input type="number" id="zmin" value="10" min="0" max="18" />
+        </label>
+        <label>
+          Z max
+          <input type="number" id="zmax" value="14" min="0" max="18" />
+        </label>
+
+        <label>
+          GPX / KML
+          <input type="file" id="gpxkml" accept=".gpx,.kml,.xml" />
+        </label>
+
+        <button type="button" id="btn-select" class="secondary">Sélection rect.</button>
+        <button type="button" id="btn-clear" class="secondary">Effacer</button>
+        <button type="button" id="btn-generate" disabled>Générer MBTiles</button>
+      </div>
+    </header>
+
+    <div id="map"></div>
+
+    <div class="status-bar">
+      <span id="status">Sélectionnez une zone rectangulaire sur la carte</span>
+      <div id="progress-wrap">
+        <progress id="progress" value="0" max="100"></progress>
+      </div>
+      <span class="bbox-info" id="bbox-info"></span>
+    </div>
+  </div>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- AreaSelect (rectangle centré redimensionnable) -->
+  <script src="https://cdn.jsdelivr.net/gh/heyman/leaflet-areaselect@master/src/leaflet-areaselect.js"></script>
+  <!-- toGeoJSON for GPX/KML -->
+  <script src="https://cdn.jsdelivr.net/npm/@mapbox/togeojson@0.16.0/togeojson.js"></script>
+  <!-- sql.js (SQLite WASM) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
