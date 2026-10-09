@@ -173,9 +173,24 @@ progress::-webkit-progress-value {
   background: #0d0d1a;
 }
 
-/* AreaSelect overlay tweak */
+/* AreaSelect overlay – ensure visibility above map tiles */
 .leaflet-areaselect-container {
-  z-index: 500 !important;
+  z-index: 1000 !important;
+  pointer-events: none;
+}
+.leaflet-areaselect-handle {
+  pointer-events: auto !important;
+  z-index: 1001 !important;
+  background: #e94560 !important;
+  border: 2px solid #fff !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.leaflet-areaselect-shade {
+  background: rgba(15, 20, 40, 0.45) !important;
+  pointer-events: none;
 }
 
 @media (max-width: 700px) {

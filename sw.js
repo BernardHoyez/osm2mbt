@@ -1,12 +1,14 @@
 /* osm2mbt Service Worker – cache-busting versioned caches */
-const CACHE_VERSION = 'osm2mbt-v1.0.0';
+const CACHE_VERSION = 'osm2mbt-v1.0.1';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
   './',
   './index.html',
   './css/style.css',
+  './css/leaflet-areaselect.css',
   './js/app.js',
+  './js/leaflet-areaselect.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png'

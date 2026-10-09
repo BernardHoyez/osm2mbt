@@ -24,7 +24,8 @@
   };
 
   // ---------- State ----------
-  let map, baseLayer, areaSelect, overlayLayer, currentBounds = null;
+  let map, baseLayer, areaSelect = null, overlayLayer, currentBounds = null;
+  let selectionActive = false;
   let generating = false;
   let SQL = null;
 
@@ -77,18 +78,44 @@
     });
 
     setBasemap('osm');
+  }
 
-    // AreaSelect – rectangle centered & resizable
+  function isSelectionActive() {
+    return !!(areaSelect && areaSelect._container && areaSelect._container.parentNode);
+  }
+
+  function enableSelection() {
+    // Always create a fresh instance (plugin does not support remove + re-add cleanly)
+    if (isSelectionActive()) {
+      try { areaSelect.remove(); } catch (e) { /* ignore */ }
+    }
     areaSelect = L.areaSelect({
-      width: 280,
-      height: 200,
+      width: Math.min(280, map.getSize().x * 0.5),
+      height: Math.min(200, map.getSize().y * 0.45),
       minWidth: 40,
       minHeight: 40,
       keepAspectRatio: false
     });
-    // Not added by default – user activates it
+    areaSelect.addTo(map);
+    areaSelect.on('change', updateBoundsDisplay);
+    selectionActive = true;
+    $('btn-select').textContent = 'Désactiver sélection';
+    $('btn-select').classList.remove('secondary');
+    updateBoundsDisplay();
+  }
 
-    map.on('moveend', updateBoundsDisplay);
+  function disableSelection() {
+    if (isSelectionActive()) {
+      try { areaSelect.remove(); } catch (e) { /* ignore */ }
+    }
+    areaSelect = null;
+    selectionActive = false;
+    currentBounds = null;
+    bboxEl.textContent = '';
+    btnGenerate.disabled = true;
+    $('btn-select').textContent = 'Sélection rect.';
+    $('btn-select').classList.add('secondary');
+    setStatus('Sélection désactivée – cliquez sur « Sélection rect. »');
   }
 
   function setBasemap(key) {
@@ -104,7 +131,7 @@
   }
 
   function updateBoundsDisplay() {
-    if (!areaSelect || !areaSelect._container || !areaSelect._container.parentNode) {
+    if (!isSelectionActive()) {
       currentBounds = null;
       bboxEl.textContent = '';
       btnGenerate.disabled = true;
@@ -345,16 +372,10 @@
     $('basemap').addEventListener('change', (e) => setBasemap(e.target.value));
 
     $('btn-select').addEventListener('click', () => {
-      if (areaSelect._container && areaSelect._container.parentNode) {
-        areaSelect.remove();
-        currentBounds = null;
-        bboxEl.textContent = '';
-        btnGenerate.disabled = true;
-        setStatus('Sélection désactivée');
+      if (isSelectionActive()) {
+        disableSelection();
       } else {
-        areaSelect.addTo(map);
-        areaSelect.on('change', updateBoundsDisplay);
-        updateBoundsDisplay();
+        enableSelection();
       }
     });
 
@@ -363,12 +384,7 @@
         map.removeLayer(overlayLayer);
         overlayLayer = null;
       }
-      if (areaSelect._container && areaSelect._container.parentNode) {
-        areaSelect.remove();
-      }
-      currentBounds = null;
-      bboxEl.textContent = '';
-      btnGenerate.disabled = true;
+      disableSelection();
       setStatus('Carte réinitialisée');
     });
 
