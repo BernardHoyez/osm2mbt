@@ -420,32 +420,94 @@
     $('zmax').addEventListener('change', updateBoundsDisplay);
   }
 
-  // ---------- PWA ----------
+  // ---------- PWA install ----------
+  let deferredPrompt = null;
+
+  function setupInstall() {
+    const btn = $('btn-install');
+    if (!btn) return;
+
+    // Already running as installed PWA?
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+    if (isStandalone) {
+      btn.style.display = 'none';
+      return;
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      btn.style.display = '';
+      setStatus('Prêt à installer – cliquez sur « Installer »');
+    });
+
+    btn.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        // Fallback instructions
+        const ua = navigator.userAgent || '';
+        let tip = 'Menu du navigateur → « Installer l\'application » ou « Ajouter à l\'écran d\'accueil ».';
+        if (/iPhone|iPad|iPod/.test(ua)) {
+          tip = 'Safari → bouton Partager → « Sur l\'écran d\'accueil ».';
+        } else if (/Firefox/.test(ua)) {
+          tip = 'Firefox → menu ⋮ → « Installer ».';
+        } else if (/Edg\//.test(ua)) {
+          tip = 'Edge → icône ⊕ dans la barre d\'adresse, ou menu → Applications → Installer.';
+        } else if (/Chrome/.test(ua)) {
+          tip = 'Chrome → icône ⊕ dans la barre d\'adresse, ou menu ⋮ → « Installer osm2mbt… ».';
+        }
+        alert(
+          'Installation non proposée automatiquement.\n\n' +
+            tip +
+            '\n\nSi le navigateur dit « déjà installée » :\n' +
+            '1. chrome://apps (ou edge://apps) → retirer osm2mbt\n' +
+            '2. Paramètres du site → Effacer les données\n' +
+            '3. Recharger la page (Ctrl+Shift+R)'
+        );
+        return;
+      }
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      btn.style.display = 'none';
+      setStatus(
+        choice.outcome === 'accepted'
+          ? 'Application installée'
+          : 'Installation annulée'
+      );
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      btn.style.display = 'none';
+      setStatus('Application installée');
+    });
+  }
+
   function registerSW() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('./sw.js')
-        .then((reg) => {
-          reg.addEventListener('updatefound', () => {
-            const nw = reg.installing;
-            if (nw) {
-              nw.addEventListener('statechange', () => {
-                if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-                  // Force activation of new SW (cache-bust)
-                  nw.postMessage('SKIP_WAITING');
-                }
-              });
+    if (!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker
+      .register('./sw.js', { scope: './' })
+      .then((reg) => {
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              nw.postMessage('SKIP_WAITING');
             }
           });
-        })
-        .catch((err) => console.warn('SW registration failed', err));
-    }
+        });
+      })
+      .catch((err) => console.warn('SW registration failed', err));
   }
 
   // ---------- Boot ----------
   document.addEventListener('DOMContentLoaded', () => {
     initMap();
     bindUI();
+    setupInstall();
     registerSW();
     setStatus('Prêt – activez la sélection rectangulaire');
   });

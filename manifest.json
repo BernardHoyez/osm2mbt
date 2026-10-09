@@ -1,24 +1,42 @@
 {
-  "name": "osm2mbt",
+  "id": "/osm2mbt/",
+  "name": "osm2mbt – OSM to MBTiles",
   "short_name": "osm2mbt",
-  "description": "OSM to MBTiles converter PWA – sélection rectangulaire, GPX/KML, génération MBTiles",
-  "start_url": "./index.html",
+  "description": "Convertisseur OSM vers MBTiles : sélection rectangulaire, GPX/KML, génération offline",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "browser"],
   "background_color": "#1a1a2e",
   "theme_color": "#16213e",
   "orientation": "any",
+  "lang": "fr",
+  "dir": "ltr",
+  "categories": ["navigation", "utilities"],
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

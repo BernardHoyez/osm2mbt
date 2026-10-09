@@ -7,8 +7,11 @@
   <meta name="description" content="osm2mbt – Convertisseur OSM → MBTiles (sélection rectangulaire, GPX/KML)" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/png" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>osm2mbt</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -55,6 +58,7 @@
         <button type="button" id="btn-select" class="secondary">Sélection rect.</button>
         <button type="button" id="btn-clear" class="secondary">Effacer</button>
         <button type="button" id="btn-generate" disabled>Générer MBTiles</button>
+        <button type="button" id="btn-install" class="secondary" title="Installer l'application" style="display:none">Installer</button>
       </div>
     </header>
 
