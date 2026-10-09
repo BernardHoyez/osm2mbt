@@ -1,5 +1,5 @@
 /* osm2mbt Service Worker – cache-busting versioned caches */
-const CACHE_VERSION = 'osm2mbt-v1.0.1';
+const CACHE_VERSION = 'osm2mbt-v1.0.2';
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [

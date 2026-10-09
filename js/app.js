@@ -3,7 +3,26 @@
   'use strict';
 
   // ---------- Tile sources ----------
+  // OSM standard = local-language names (Vietnamese in Vietnam).
+  // lima / esri / carto prioritise English or international labels.
   const TILE_SOURCES = {
+    lima: {
+      url: 'https://cdn.lima-labs.com/{z}/{x}/{y}.png?api=demo',
+      attribution: '© OpenStreetMap contributors · Lima Labs',
+      maxZoom: 18
+    },
+    esri: {
+      // Esri uses z/y/x order in the path
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      attribution: 'Tiles © Esri — Source: Esri, OpenStreetMap, and others',
+      maxZoom: 19
+    },
+    carto: {
+      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+      attribution: '© OpenStreetMap contributors © CARTO',
+      maxZoom: 20,
+      subdomains: 'abcd'
+    },
     osm: {
       url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '© OpenStreetMap contributors',
@@ -77,7 +96,7 @@
       zoomControl: true
     });
 
-    setBasemap('osm');
+    setBasemap('lima'); // default: English / anglicized labels
   }
 
   function isSelectionActive() {
@@ -121,12 +140,13 @@
   function setBasemap(key) {
     if (baseLayer) map.removeLayer(baseLayer);
     const src = TILE_SOURCES[key];
-    baseLayer = L.tileLayer(src.url, {
+    const opts = {
       attribution: src.attribution,
-      maxZoom: src.maxZoom,
-      subdomains: src.subdomains || '',
+      maxZoom: src.maxZoom || 18,
       crossOrigin: true
-    });
+    };
+    if (src.subdomains) opts.subdomains = src.subdomains;
+    baseLayer = L.tileLayer(src.url, opts);
     baseLayer.addTo(map);
   }
 
@@ -316,6 +336,7 @@
         while (tasks.length) {
           const t = tasks.shift();
           if (!t) break;
+          // Build tile URL (support both {z}/{x}/{y} and Esri-style {z}/{y}/{x})
           let url = src.url
             .replace('{z}', t.z)
             .replace('{x}', t.x)
